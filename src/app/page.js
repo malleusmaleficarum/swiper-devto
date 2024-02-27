@@ -1,95 +1,67 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+import Image from 'next/image';
+import styles from './page.module.scss';
+import { data } from '@/data/swiperData';
+import Link from 'next/link';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { useState, useEffect } from 'react';
+import { Controller } from 'swiper/modules';
+import 'swiper/scss';
 
 export default function Home() {
+  const [swiperControll, setSwiperControll] = useState(null);
+  const [swiperControllSecond, setSwiperControllSecond] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    setReady(true);
+  }, []);
+
+  if (!ready) return null;
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className={styles.container}>
+      <div className={styles.left}>
+        <div className={styles.nav}>
+          <button onClick={() => swiperControll.slidePrev()}>{'<'}</button>
+          <button onClick={() => swiperControll.slideNext()}>{'>'}</button>
         </div>
+
+        <Swiper
+          slidesPerView={1}
+          onSwiper={(swiper) => setSwiperControll(swiper)}
+          onSlideChange={() => setActiveIndex(swiperControll.activeIndex)}
+          modules={[Controller]}
+          controller={{ control: swiperControllSecond }}
+        >
+          {data.map((d, i) => (
+            <SwiperSlide key={i}>
+              <h1>{d.title}</h1>
+              <p className={styles.desc}>{d.desc}</p>
+              <Link href={'#'}>Read More</Link>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+        <p className={styles.pagination}>{`${activeIndex + 1} / ${
+          data.length
+        }`}</p>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className={styles.right}>
+        <Swiper
+          modules={[Controller]}
+          controller={{ control: swiperControll }}
+          onSwiper={setSwiperControllSecond}
+        >
+          {data.map((data, i) => (
+            <SwiperSlide key={i} style={{ height: '100%', width: '100%' }}>
+              <div className={styles.imgContainer}>
+                <Image src={data.img} alt='' fill priority />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   );
 }
